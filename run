@@ -50,7 +50,7 @@ case $1 in
     clean)
         mvn clean
         find . -type f ! \( \
-            -name .git -o \
+            -path './.git/*' -o \
             -name .gitignore -o \
             -name README.md -o \
             -name run -o \
