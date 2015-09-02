@@ -1,6 +1,6 @@
---- pom.xml.original	2015-09-02 11:37:15.000000000 -0300
-+++ pom.xml	2015-09-02 14:10:40.000000000 -0300
-@@ -7,15 +7,53 @@
+--- pom.xml.original	2015-09-02 16:15:53.000000000 -0300
++++ pom.xml	2015-09-02 16:45:51.000000000 -0300
+@@ -7,15 +7,59 @@
    <version>1.0-SNAPSHOT</version>
    <name>wildfly-native-management-api-sample Maven Webapp</name>
    <url>http://maven.apache.org</url>
@@ -45,6 +45,12 @@
 +        <groupId>org.wildfly.plugins</groupId>
 +        <artifactId>wildfly-maven-plugin</artifactId>
 +        <version>${version.wildfly.maven.plugin}</version>
++        <configuration>
++          <hostname>${env.WILDFLY_HOSTNAME}</hostname>
++          <port>${env.WILDFLY_PORT}</port>
++          <username>${env.WILDFLY_USERNAME}</username>
++          <password>${env.WILDFLY_PASSWORD}</password>
++        </configuration>
 +      </plugin>
 +      <plugin>
 +        <artifactId>maven-compiler-plugin</artifactId>

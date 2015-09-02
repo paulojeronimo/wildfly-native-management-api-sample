@@ -4,11 +4,13 @@ set +x
 BASEDIR=`cd "$(dirname "$0")"; pwd`
 ARTIFACT_ID=`basename "$BASEDIR"`
 
-ip=${ip:-localhost}
-username=${username:-fulano}
-password=${password:-senha}
-
 WILDFLY_HOME=${WILDFLY_HOME:-$PWD/wildfly-8.2.0.Final}
+export WILDFLY_HOSTNAME=${WILDFLY_HOSTNAME:-localhost}
+WILDFLY_PORT_OFFSET=${WILDFLY_PORT_OFFSET:-0}
+export WILDFLY_PORT=${WILDFLY_PORT:-$((9990+WILDFLY_PORT_OFFSET))}
+export WILDFLY_USERNAME=${WILDFLY_USERNAME:-fulano}
+export WILDFLY_PASSWORD=${WILDFLY_PASSWORD:-senha}
+
 export JBOSS_HOME=$WILDFLY_HOME
 
 case $1 in
@@ -26,17 +28,17 @@ case $1 in
         done
         mvn eclipse:eclipse
     ;;
-	package)
-		mvn package
-	;;
-	test)
-		java -cp "$WILDFLY_HOME"/bin/client/jboss-cli-client.jar:target/classes: com.example.Main $ip $username $password
-	;;
-	wildfly-add-user)
-		$WILDFLY_HOME/bin/add-user.sh -s -u $username -p $password
-	;;
-	wildfly-start)
-        $WILDFLY_HOME/bin/standalone.sh -b $ip -bmanagement=$ip &
+    package)
+        mvn package
+    ;;
+    test)
+        java -cp "$WILDFLY_HOME"/bin/client/jboss-cli-client.jar:target/classes: com.example.Main $WILDFLY_HOSTNAME $WILDFLY_USERNAME $WILDFLY_PASSWORD
+    ;;
+    wildfly-add-user)
+        $WILDFLY_HOME/bin/add-user.sh -s -u $WILDFLY_USERNAME -p $WILDFLY_PASSWORD
+    ;;
+    wildfly-start)
+        $WILDFLY_HOME/bin/standalone.sh -b $WILDFLY_HOSTNAME -Djboss.socket.binding.port-offset=$WILDFLY_PORT_OFFSET -bmanagement=$WILDFLY_HOSTNAME &
     ;;
     wildfly-deploy)
         mvn wildfly:deploy
@@ -45,7 +47,7 @@ case $1 in
         mvn wildfly:undeploy
     ;;
     wildfly-stop)
-        $WILDFLY_HOME/bin/jboss-cli.sh --controller=$ip -c :shutdown
+        $WILDFLY_HOME/bin/jboss-cli.sh --controller=$WILDFLY_HOSTNAME:$WILDFLY_PORT -c :shutdown
     ;;
     clean)
         mvn clean
@@ -59,6 +61,6 @@ case $1 in
         \) -delete
         find . -type d -empty -delete
         ;;
-	*)
-		echo "Comando inválido: $1"
+    *)
+        echo "Comando inválido: $1"
 esac
