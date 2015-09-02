@@ -1,0 +1,13 @@
+--- index.jsp.original	2015-09-02 11:50:56.000000000 -0300
++++ index.jsp	2015-09-02 14:17:38.000000000 -0300
+@@ -1,5 +1,10 @@
+ <html>
+ <body>
+ <h2>Hello World!</h2>
++<%
++com.example.Main main = new com.example.Main();
++main.main(new String[]{"localhost", "beltrano", "outrasenha"});
++out.println("<h3>" + main.getResult() + "</h3>");
++%>
+ </body>
+ </html>

@@ -1,0 +1,64 @@
+#!/bin/bash
+set +x
+
+BASEDIR=`cd "$(dirname "$0")"; pwd`
+ARTIFACT_ID=`basename "$BASEDIR"`
+
+ip=${ip:-localhost}
+username=${username:-fulano}
+password=${password:-senha}
+
+WILDFLY_HOME=${WILDFLY_HOME:-$PWD/wildfly-8.2.0.Final}
+export JBOSS_HOME=$WILDFLY_HOME
+
+case $1 in
+    generate)
+        cd "$BASEDIR"
+        mvn archetype:generate -DgroupId=com.example -DartifactId=$ARTIFACT_ID -DarchetypeArtifactId=maven-archetype-webapp -DinteractiveMode=false
+        rsync -a $ARTIFACT_ID/ .
+        rm -rf $ARTIFACT_ID/ src/main/webapp/WEB-INF/web.xml
+        for f in `find . -type f -name \*.patch`
+        do
+            f=${f%%.patch}
+            [ -f $f ] || continue
+            cp $f $f.original
+            patch $f $f.patch
+        done
+        mvn eclipse:eclipse
+    ;;
+	package)
+		mvn package
+	;;
+	test)
+		java -cp "$WILDFLY_HOME"/bin/client/jboss-cli-client.jar:target/classes: com.example.Main $ip $username $password
+	;;
+	wildfly-add-user)
+		$WILDFLY_HOME/bin/add-user.sh -s -u $username -p $password
+	;;
+	wildfly-start)
+        $WILDFLY_HOME/bin/standalone.sh -b $ip -bmanagement=$ip &
+    ;;
+    wildfly-deploy)
+        mvn wildfly:deploy
+    ;;
+    wildfly-undeploy)
+        mvn wildfly:undeploy
+    ;;
+    wildfly-stop)
+        $WILDFLY_HOME/bin/jboss-cli.sh --controller=$ip -c :shutdown
+    ;;
+    clean)
+        mvn clean
+        find . -type f ! \( \
+            -name .git -o \
+            -name .gitignore -o \
+            -name README.md -o \
+            -name run -o \
+            -name Main.java -o \
+            -name \*.patch \
+        \) -delete
+        find . -type d -empty -delete
+        ;;
+	*)
+		echo "Comando inválido: $1"
+esac
