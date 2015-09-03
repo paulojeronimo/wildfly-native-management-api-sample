@@ -17,6 +17,12 @@ export WILDFLY_HOME=$PWD/wildfly-8.2.0.Final
 ./run generate
 ```
 
+## Configuração do Wildfly
+
+```
+./run config
+```
+
 ## Variáveis (utilizadas pelo script run e que você pode configurar)
 
 1. ``WILDFLY_HOSTNAME``: nome (ou ip) do host em que o Wildfly fará o bind.
@@ -90,7 +96,7 @@ eval "$(docker-machine env dm1)"
 ```
 export WILDFLY_USERNAME=fulano
 export WILDFLY_PASSWORD=senha
-docker run --name wildfly -d -p 8080:8080 -p 9990:9990 jboss/wildfly:8.2.0.Final /opt/jboss/wildfly/bin/standalone.sh -b 0.0.0.0 -bmanagement 0.0.0.0
+docker run --name wildfly -d -p 8080:8080 -p 9990:9990 jboss/wildfly:8.2.0.Final /opt/jboss/wildfly/bin/standalone.sh -c standalone-full.xml -b 0.0.0.0 -bmanagement 0.0.0.0
 docker logs -f wildfly &
 docker exec wildfly /opt/jboss/wildfly/bin/add-user.sh -s -u $WILDFLY_USERNAME -p $WILDFLY_PASSWORD
 ./run deploy

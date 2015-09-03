@@ -6,3 +6,4 @@ src/main/webapp/index.jsp*
 target
 !*.patch
 wildfly-8.2.0.Final*
+!wildfly-8.2.0.Final.config
