@@ -32,32 +32,32 @@ case $1 in
         mvn package
     ;;
     test)
-        java -cp "$WILDFLY_HOME"/bin/client/jboss-cli-client.jar:target/classes: com.example.Main $WILDFLY_HOSTNAME $WILDFLY_USERNAME $WILDFLY_PASSWORD
+        java -cp "$WILDFLY_HOME"/bin/client/jboss-cli-client.jar:target/classes: com.example.Main $WILDFLY_HOSTNAME $WILDFLY_PORT $WILDFLY_USERNAME $WILDFLY_PASSWORD
     ;;
-    wildfly-add-user)
-        $WILDFLY_HOME/bin/add-user.sh -s -u $WILDFLY_USERNAME -p $WILDFLY_PASSWORD
+    add-user)
+        "$WILDFLY_HOME"/bin/add-user.sh -s -u $WILDFLY_USERNAME -p $WILDFLY_PASSWORD
     ;;
-    wildfly-start)
-        $WILDFLY_HOME/bin/standalone.sh -b $WILDFLY_HOSTNAME -Djboss.socket.binding.port-offset=$WILDFLY_PORT_OFFSET -bmanagement=$WILDFLY_HOSTNAME &
+    start)
+        "$WILDFLY_HOME"/bin/standalone.sh -b $WILDFLY_HOSTNAME -Djboss.socket.binding.port-offset=$WILDFLY_PORT_OFFSET -bmanagement=$WILDFLY_HOSTNAME &
     ;;
-    wildfly-deploy)
+    stop)
+        "$WILDFLY_HOME"/bin/jboss-cli.sh --controller=$WILDFLY_HOSTNAME:$WILDFLY_PORT -c :shutdown
+    ;;
+    deploy)
         mvn wildfly:deploy
     ;;
-    wildfly-undeploy)
+    undeploy)
         mvn wildfly:undeploy
-    ;;
-    wildfly-stop)
-        $WILDFLY_HOME/bin/jboss-cli.sh --controller=$WILDFLY_HOSTNAME:$WILDFLY_PORT -c :shutdown
     ;;
     clean)
         mvn clean
         find . -type f ! \( \
-            -path './.git/*' -o \
-            -name .gitignore -o \
+            -path './.git/*' -o -name .gitignore -o \
             -name README.md -o \
             -name run -o \
             -name Main.java -o \
-            -name \*.patch \
+            -name \*.patch -o \
+            -path './wildfly-8.2.0.Final/*' -o -name wildfly-8.2.0.Final\* \
         \) -delete
         find . -type d -empty -delete
         ;;
