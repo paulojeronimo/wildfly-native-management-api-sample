@@ -26,7 +26,8 @@ public class Main {
 		final String username = args[2];
 		final String password = args[3];
 
-		ModelControllerClient client = ModelControllerClient.Factory.create(InetAddress.getByName(server),
+		System.out.println("server: " + server + ", port: " + port + ", username: " + username + ", password: " + password);
+		ModelControllerClient client = ModelControllerClient.Factory.create("remote", InetAddress.getByName(server),
 				Integer.valueOf(port), new CallbackHandler() {
 
 					public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
@@ -63,6 +64,8 @@ public class Main {
 			System.out.println("Result:");
 			result = returnVal.toJSONString(false);
 			System.out.println(result);
+		} catch (Exception e) {
+			e.printStackTrace();
 		} finally {
 			client.close();
 		}
